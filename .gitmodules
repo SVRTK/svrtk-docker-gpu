@@ -1,0 +1,4 @@
+[submodule "Segmentation_FetalMRI"]
+	path = Segmentation_FetalMRI
+	url = https://github.com/SVRTK/Segmentation_FetalMRI.git
+	branch = dev
