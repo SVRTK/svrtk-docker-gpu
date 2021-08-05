@@ -2,3 +2,6 @@
 	path = Segmentation_FetalMRI
 	url = https://github.com/SVRTK/Segmentation_FetalMRI.git
 	branch = dev
+[submodule "MIRTK"]
+	path = MIRTK
+	url = https://github.com/SVRTK/MIRTK.git
