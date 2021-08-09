@@ -39,12 +39,10 @@ RUN apt-get install -y \
 	libtbb-dev \
 	libfltk1.3-dev
 
-# TODO: full MIRTK / SVRTK installation from Github, rather than COPY local files?
-# Install MIRTK
-RUN git clone https://github.com/SVRTK/MIRTK.git /home/MIRTK
-
-# Install SVRTK Package
-COPY /MIRTK/Packages/SVRTK /home/MIRTK/Packages/SVRTK ### TODO: change to RUN git clone
+# Install MIRTK/SVRTK
+COPY /MIRTK /home/MIRTK
+RUN mkdir /home/MIRTK/Packages/SVRTK
+COPY /SVRTK /home/MIRTK/Packages/SVRTK
 RUN mkdir /home/MIRTK/build \
 	&& cd /home/MIRTK/build \
 	&& cmake -D WITH_TBB="ON" -D MODULE_SVRTK="ON" .. \
@@ -53,12 +51,13 @@ RUN mkdir /home/MIRTK/build \
 # Update PATH
 ENV PATH="$PATH:/home/MIRTK/build/bin:/home/MIRTK/build/lib/tools"
 
-# Copy test files and scripts
+# Copy Git repo directories
 COPY /recon /home/recon
-COPY /scripts/docker-recon-brain.sh /home/scripts
-
-# Copy Segmentation_FetalMRI code
+COPY /scripts /home/scripts
 COPY /Segmentation_FetalMRI /home/Segmentation_FetalMRI
+
+# Copy Pre-trained Model Weights
+COPY /Segmentation_FetalMRI/trained-models /home/Segmentation_FetalMRI/trained-models
 
 # Pip
 RUN python -m pip install -r /home/Segmentation_FetalMRI/requirements.txt
