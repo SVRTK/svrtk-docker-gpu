@@ -34,7 +34,7 @@ Ensure that you have the following packages installed on your system:
 
 ```
 $ git clone https://github.com/ImperialCollegeLondon/WebMRRecon.git
-$ cd svrtk-docker-gpu-dev
+$ cd svrtk-docker-gpu
 ```
 
 #### 2. Download the pre-trained neural network weights (nb: download file size >500Mb):
@@ -62,3 +62,19 @@ mirtk
 ```
 
 It should output the MIRTK usage instructions.
+
+
+## Usage
+
+#### 1. Run automated SVR:
+
+Copy nifti files (labelled `stack1.nii.gz`, `stack2.nii.gz`, ... `stackN.nii.gz`) into the `svrtk-docker-gpu/recon` folder.
+
+Then:
+
+```
+$ cd svrtk-docker-gpu
+$ docker run --gpus all -it -v "svrtk-docker-gpu/recon":/home/recon svrtk-docker-gpu /home/scripts/docker-recon-brain.sh /home/recon
+```
+
+This will output a 3D SVR-reconstructed volume named `SVR-output.nii.gz`.
