@@ -3,16 +3,19 @@
 
 echo
 echo "-----------------------------------------------------------------------------"
+echo "RUNNING AUTOMATED SVR RECONSTRCTION"
 echo "-----------------------------------------------------------------------------"
 echo
 
 
 default_recon_dir=$1
 
+
+# Paths
 mirtk_path=/home/MIRTK/build/bin
 segm_path=/home/Segmentation_FetalMRI
-check_path_brain=/home/Segmentation_FetalMRI/trained-models/checkpoints-brain-loc-2-labels
-check_path_brain_cropped=/home/Segmentation_FetalMRI/trained-models/checkpoints-brain-loc-2-labels-cropped
+check_path_brain=/home/Segmentation_FetalMRI/trained-models/checkpoints-brain-loc-labels
+check_path_brain_cropped=/home/Segmentation_FetalMRI/trained-models/checkpoints-brain-loc-labels-cropped
 
 
 test_dir=${default_recon_dir}
@@ -21,32 +24,26 @@ if [[ ! -d ${test_dir} ]];then
 	exit
 fi 
 
-
-# conda init bash
 source ~/.bashrc
-
-# cd ${segm_path}
-#conda env create -f environment.yml
-#conda env list
-# conda activate Segmentation_FetalMRI
-
 
 cd ${default_recon_dir}
 main_dir=$(pwd)
 
 
+# Parameters
 res=128
 all_num_lab=1
 current_lab=1
 
 #CHANGE BACK TO 4 AFTER TESTING !!!!
-num_packages=4
+num_packages=1
 
 #AUTOMATICALLY GUESS
 default_thickness=2.5
 
 #FOR TESTING ONLY - CHANGE TO 0.85 AFTER TESTING
 output_resolution=0.85
+
 
 
 roi_recon_mode=(0)
@@ -149,23 +146,22 @@ echo
 number_of_stacks=$(ls cnn-recon-org-files-packages/*.nii* | wc -l)
 stack_names=$(ls cnn-recon-org-files-packages/*.nii*)
 
-${mirtk_path}/mirtk prepare-for-cnn cnn-recon-res-files cnn-recon-stack-files run.csv run-info-summary.csv ${res} ${number_of_stacks} $(echo $stack_names)  ${all_num_lab} 0 
+${mirtk_path}/mirtk prepare-for-cnn cnn-recon-res-files stack-files run.csv run-info-summary.csv ${res} ${number_of_stacks} $(echo $stack_names)  ${all_num_lab} 0 
 
 
 main_dir=$(pwd)
 
 
+
 PYTHONIOENCODING=utf-8 python ${segm_path}/run_cnn_loc.py ${segm_path}/ ${check_path_brain}/ ${main_dir}/ ${main_dir}/cnn-out-files/ run.csv ${res} ${all_num_lab}
 
-# # TR17 --- temporary script exit
-# exit
-# # end TR17
+
 
 #ls  ${main_dir}/cnn-out-files
 
 
 out_mask_names=$(ls cnn-out-files/*seg_pr*.nii*)
-out_stack_names=$(ls cnn-recon-stack-files/*.nii*)
+out_stack_names=$(ls stack-files/*.nii*)
 
 IFS=$'\n' read -rd '' -a all_masks <<<"$out_mask_names"
 IFS=$'\n' read -rd '' -a all_stacks <<<"$out_stack_names"
@@ -179,13 +175,26 @@ echo
 mkdir cropped-files
 mkdir cropped-cnn-out-files
 
+mkdir tmp-masks-global
+
 
 for ((i=0;i<${#all_stacks[@]};i++));
 do
 
-	${mirtk_path}/mirtk dilate-image cnn-out-files/*-${i}_seg_pr*.nii* dl-m.nii.gz -iterations 6 
+	jj=$((${i}+1000))
 
-	${mirtk_path}/mirtk crop_volume cnn-recon-stack-files/stack-${i}.nii.gz dl-m.nii.gz cropped-files/cropped-stack-${i}.nii.gz 
+	echo ${jj} " ... "
+
+	${mirtk_path}/mirtk extract-label cnn-out-files/*-${jj}_seg_pr*.nii* tmp-org-m.nii.gz 1 1  
+
+	${mirtk_path}/mirtk extract-connected-components tmp-org-m.nii.gz tmp-org-m.nii.gz -max-size 950000
+
+	cp tmp-org-m.nii.gz  tmp-masks-global/mask-${jj}.nii.gz
+
+	${mirtk_path}/mirtk dilate-image tmp-org-m.nii.gz  dl-m.nii.gz -iterations 6 
+
+	${mirtk_path}/mirtk crop_volume stack-files/stack-${jj}.nii.gz dl-m.nii.gz cropped-files/cropped-stack-${jj}.nii.gz 
+
 
 done
 
@@ -212,7 +221,7 @@ echo
 cd ${main_dir}
 
 out_mask_names=$(ls cropped-cnn-out-files/*seg_pr*.nii*)
-out_stack_names=$(ls cnn-recon-stack-files/*.nii*)
+out_stack_names=$(ls stack-files/*.nii*)
 
 IFS=$'\n' read -rd '' -a all_masks <<<"$out_mask_names"
 IFS=$'\n' read -rd '' -a all_stacks <<<"$out_stack_names"
@@ -223,7 +232,7 @@ do
 
 	cd ${main_dir}
 
-	mkdir cnn-recon-mask-files-${roi_ids[j]}
+	mkdir mask-files-${roi_ids[j]}
 
 	echo 
 
@@ -236,15 +245,19 @@ do
 	for ((i=0;i<${#all_masks[@]};i++));
 	do
 
+	    jj=$((${i}+1000))
+																																								
 
-	    ${mirtk_path}/mirtk transform-image cropped-cnn-out-files/*-${i}_seg_pr*.nii* cnn-recon-mask-files-${roi_ids[j]}/mask-${i}.nii.gz -target cnn-recon-stack-files/stack-${i}.nii.gz -interp NN
+	    #${mirtk_path}/mirtk transform-image cropped-cnn-out-files/*-${jj}_seg_pr*.nii* mask-files-${roi_ids[j]}/mask-${jj}.nii.gz -target stack-files/stack-${jj}.nii.gz -interp NN
 
-	    ${mirtk_path}/mirtk extract-label cnn-recon-mask-files-${roi_ids[j]}/mask-${i}.nii.gz cnn-recon-mask-files-${roi_ids[j]}/mask-${i}.nii.gz ${current_lab} ${current_lab}
+	    ${mirtk_path}/mirtk transform-image cropped-cnn-out-files/*-${jj}_seg_pr*.nii* mask-files-${roi_ids[j]}/mask-${jj}.nii.gz -target cropped-files/*-${jj}.nii.gz -interp NN																																			  
 
-	    ${mirtk_path}/mirtk extract-connected-components cnn-recon-mask-files-${roi_ids[j]}/mask-${i}.nii.gz cnn-recon-mask-files-${roi_ids[j]}/mask-${i}.nii.gz
+	    ${mirtk_path}/mirtk extract-label mask-files-${roi_ids[j]}/mask-${jj}.nii.gz mask-files-${roi_ids[j]}/mask-${jj}.nii.gz ${current_lab} ${current_lab}
+
+	    ${mirtk_path}/mirtk extract-connected-components mask-files-${roi_ids[j]}/mask-${jj}.nii.gz mask-files-${roi_ids[j]}/mask-${jj}.nii.gz -max-size 604000
 
 
-	   echo cnn-recon-stack-files/stack-${i}.nii.gz " - " cropped-cnn-out-files/*-${i}_seg_pr*.nii* " - " cnn-recon-mask-files-${roi_ids[j]}/mask-${i}.nii.gz
+	   echo stack-files/stack-${jj}.nii.gz " - " cropped-cnn-out-files/*-${jj}_seg_pr*.nii* " - " mask-files-${roi_ids[j]}/mask-${jj}.nii.gz
 
 
 	done
@@ -269,7 +282,6 @@ do
 	echo "ROI : " ${roi_names[j]} " ... "
 	echo
 
-
 	test_dir=out-proc-${roi_names[j]}
 	if [[ -d ${test_dir} ]];then
 		rm -r out-proc-${roi_names[j]}
@@ -278,15 +290,37 @@ do
 	mkdir out-proc-${roi_names[j]}
 	cd out-proc-${roi_names[j]}
 
-	number_of_stacks=$(ls ../cnn-recon-stack-files/*.nii* | wc -l)
-	stack_names=$(ls ../cnn-recon-stack-files/*.nii*)
-	mask_names=$(ls ../cnn-recon-mask-files-${roi_ids[j]}/*.nii*)
 
 
-	${mirtk_path}/mirtk reconstruct ${main_dir}/${roi_recon[j]}-output.nii.gz ${number_of_stacks} $(echo $stack_names) -masks $(echo $mask_names) -default_thickness ${default_thickness} -remote -iterations 3 -resolution ${output_resolution}
+	number_of_stacks=$(ls ../cropped-files/*.nii* | wc -l)
+	stack_names=$(ls ../cropped-files/*.nii*)
+	mask_names=$(ls ../mask-files-${roi_ids[j]}/*.nii*)
+
+	
+
+	mkdir proc-stacks
+	${mirtk_path}/mirtk stacks-and-masks-selection ${number_of_stacks} $(echo $stack_names) $(echo $mask_names) proc-stacks 15 1
+
+
+	${mirtk_path}/mirtk average-images zz.nii.gz proc-stacks/*nii* 
+	${mirtk_path}/mirtk resample-image zz.nii.gz zz.nii.gz -size 1 1 1
+	${mirtk_path}/mirtk average-images zz.nii.gz proc-stacks/*nii* -target zz.nii.gz  
+	${mirtk_path}/mirtk transform-image average_mask_cnn.nii.gz average_mask_cnn.nii.gz -target zz.nii.gz -interp NN 
+	${mirtk_path}/mirtk transform-image selected_template.nii.gz selected_template.nii.gz -target zz.nii.gz 
+
+	cp zz.nii.gz selected_template.nii.gz 
+
+
+	${mirtk_path}/mirtk erode-image average_mask_cnn.nii.gz average_mask_cnn.nii.gz
+
+
+	nStacks=$(ls proc-stacks/*.nii* | wc -l)
 
 
 
+	${mirtk_path}/mirtk reconstruct ${main_dir}/${roi_recon[j]}-output.nii.gz  ${nStacks} proc-stacks/*.nii* -mask average_mask_cnn.nii.gz -template selected_template.nii.gz -default_thickness ${default_thickness} -svr_only -remote -iterations 3 -structural -resolution ${output_resolution}
+	
+	
 	test_file=${main_dir}/${roi_recon[j]}-output.nii.gz
 	if [[ -f ${test_file} ]];then
 
@@ -302,13 +336,7 @@ do
 done
 
 
-
 echo
 echo "-----------------------------------------------------------------------------"
 echo "-----------------------------------------------------------------------------"
 echo
-
-
-
-
-
