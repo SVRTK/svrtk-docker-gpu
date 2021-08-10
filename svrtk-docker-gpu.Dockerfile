@@ -52,7 +52,6 @@ RUN mkdir /home/MIRTK/build \
 ENV PATH="$PATH:/home/MIRTK/build/bin:/home/MIRTK/build/lib/tools"
 
 # Copy Git repo directories
-COPY /recon /home/recon
 COPY /scripts /home/scripts
 COPY /Segmentation_FetalMRI /home/Segmentation_FetalMRI
 
