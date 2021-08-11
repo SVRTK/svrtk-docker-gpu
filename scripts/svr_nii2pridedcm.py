@@ -1,8 +1,5 @@
 # TODO: this script needs tidying
 
-# To add a new cell, type '# %%'
-# To add a new markdown cell, type '# %% [markdown]'
-# %% [markdown]
 # # Create 3D SVR dicom
 # 
 # Converts 3D nifti file into single-frame dicom files
@@ -29,10 +26,9 @@ from pydicom.datadict import DicomDictionary, keyword_dict
 from pydicom.sequence import Sequence
 
 # %%
-dcmInPath = r'/mnt/c/TempInputSeries/DICOM/IM_0001'
-niiInPath = r'/mnt/c/svrtk-docker-gpu/recon/SVR-output.nii.gz'
-dcmOutPath = r'/mnt/c/TempOutputSeries/DICOM'
-#seriesPath = r'C:\Users\tr17\Dropbox\TempOutputSeries_2021_07_09' # for DICOMDIR generation (TODO)
+dcmInPath = r'/mnt/c/svrtk-docker-gpu-dev/pride/TempInputSeries/DICOM/IM_0001'
+niiInPath = r'/mnt/c/svrtk-docker-gpu-dev/recon/SVR-output.nii.gz'
+dcmOutPath = r'/mnt/c/svrtk-docker-gpu-dev/pride/TempOutputSeries/DICOM'
 
 if not os.path.exists( dcmOutPath ):
     os.makedirs( dcmOutPath )
@@ -57,7 +53,7 @@ new_dict_items = {
     0x20011025: ('SH', '1', "Echo Time Display MR", '', 'EchoTimeDisplayMR'),
     0x20011060: ('SL', '1', "Number Of Stacks", '', 'NumberOfStacks'),
     0x20011063: ('CS', '1', "Examination Source", '', 'ExaminationSource'),
-    0x2001107b: ('IS', '1', "Acquisition Number", '', 'AcquisitionNumber'),
+    #0x2001107b: ('IS', '1', "Acquisition Number", '', 'AcquisitionNumber'),
     0x20011081: ('IS', '1', "Number Of Dynamic Scans", '', 'NumberOfDynamicScans'),
     0x2001101a: ('FL', '3', "PC Velocity", '', 'PCVelocity'),
     0x2001101d: ('IS', '1', "Reconstruction Number MR", '', 'ReconstructionNumberMR'),
@@ -237,8 +233,7 @@ def elem_initialise(uid_instance, uid_series_instance, uid_frame_of_reference, n
         'MRAcquisitionType': '3D',
         # 'AcquisitionMatrix': nii_parameters['AcquisitionMatrix'],         # per SVR
         'SeriesInstanceUID': uid_series_instance,
-        'SeriesNumber': str(2001),                                          # should be overridden
-        'AcquisitionNumber': str(2001),                                     # should be overridden
+        'SeriesNumber': '',                                          # should be overridden
         'InstanceNumber': nii_parameters['InstanceNumber'],                 # per slice
         'ImageOrientationPatient': ['1','0','0','0','1','0'],
         #'ImagePositionPatient': [str(0),str(0),str(nii_parameters['SliceLocation'])],  # old, think broken - all args shd be constant between slices
@@ -274,6 +269,7 @@ def elem_initialise(uid_instance, uid_series_instance, uid_frame_of_reference, n
         'SeriesTime': 'SeriesTime',                     # dicom creation time
         'AcquisitionTime': 'AcquisitionTime',           # dicom acquired time
         'ContentTime': 'ContentTime',                   # dicom creation time
+        'AcquisitionNumber': 'AcquisitionNumber',
         'AccessionNumber': 'AccessionNumber',
         'Modality': 'Modality',
         'ConversionType': 'ConversionType',
@@ -493,8 +489,8 @@ for iInstance in range(0,nInstances):
         setattr(ds, k, v)
 
     # override elements
-    setattr(ds, 'SeriesNumber', str(2) + str(getattr(dcmIn, 'SeriesNumber'))) # per SVR
-    setattr(ds, 'AcquisitionNumber', str(2) + str(getattr(dcmIn, 'AcquisitionNumber'))) # per SVR
+    setattr(ds, 'SeriesNumber', str(int(str(getattr(dcmIn, 'SeriesNumber'))) + 1) ) # +1 to SeriesNumber
+    # setattr(ds, 'AcquisitionNumber', str(getattr(dcmIn, 'AcquisitionNumber')))
     # setattr(ds, 'InstanceCreationDate', str(today_date) )
     # setattr(ds, 'InstanceCreationTime', str(today_time) )
     # setattr(ds, 'SeriesDate', str(today_date) )
@@ -506,14 +502,6 @@ for iInstance in range(0,nInstances):
 
     # Add "Stack" sequence to dataset
     create_seq_stack()
-
-    # # Creation Time testing - didn't help
-    # dt = datetime.datetime.now()
-    # setattr(ds, 'ContentTime', dt.strftime('%H%M%S.%f') )
-    # time.sleep(0.11) # cheat so ContentTime/InstanceCreationTime not the same
-    # dt = datetime.datetime.now()
-    # setattr(ds, 'InstanceCreationTime', dt.strftime('%H%M%S.%f') )
-    # time.sleep(0.11) # cheat so ContentTime/InstanceCreationTime not the same
 
     # Overrides for Matthew
     # setattr(ds, 'ImagePositionPatient', [str(49.5),str(-61.5694439709180),str(61.5694439709187)] )
@@ -527,63 +515,8 @@ for iInstance in range(0,nInstances):
 
     del ds, file_meta, elements_to_define_meta, elements_to_transfer_meta, elements_to_define_ds, elements_to_transfer_ds, non_std_elements_to_define_ds
 
-
-# Create DICOMDIR
-### TODO: auto create DICOMDIR following MC's instructions
-# c:\mydicoms\DICOM\Im0001 etc... 
-# c:> dcmmkdir.exe +id 'mydicoms' +r
-# and then copy the DICOMDIR to the correct place
-# subprocess.run(['dcmmkdir', '+m', '+U', 'DICOM\\*']) # TAR old
-
-
 # Output Messages
 print('SVR 3D DICOM creation complete.')
 print('Output directory:', os.path.join(dcmOutPath) )
-
-
-# %%
-# view created dicoms
-iFileToTest = 50
-dcmTest = pyd.dcmread( os.path.join( dcmOutPath, r'IM_%04d'%(iFileToTest) ) )
-
-print('dicom file:', r'IM_%04d'%(iFileToTest))
-print('PixelSpacing =', dcmTest.PixelSpacing)
-print('SpacingBetweenSlices =', dcmTest.SpacingBetweenSlices)
-print('InstanceNumber =', dcmTest.InstanceNumber)
-print('SliceLocation =', dcmTest.SliceLocation)
-print('SeriesInstanceUID =', dcmTest.SeriesInstanceUID)
-print('SOPInstanceUID =', dcmTest.SOPInstanceUID)
-print('SeriesNumber =', dcmTest.SeriesNumber)
-print('')
-
-iFileToTest = iFileToTest + 1
-dcmTest = pyd.dcmread( os.path.join( dcmOutPath, r'IM_%04d'%(iFileToTest) ) )
-
-print('dicom file:', r'IM_%04d'%(iFileToTest))
-print('PixelSpacing =', dcmTest.PixelSpacing)
-print('SpacingBetweenSlices =', dcmTest.SpacingBetweenSlices)
-print('InstanceNumber =', dcmTest.InstanceNumber)
-print('SliceLocation =', dcmTest.SliceLocation)
-print('SeriesInstanceUID =', dcmTest.SeriesInstanceUID)
-print('SOPInstanceUID =', dcmTest.SOPInstanceUID)
-print('SeriesNumber =', dcmTest.SeriesNumber)
-print('')
-
-print('nii details:')
-print('shape:', nii_img.shape)
-print('')
-
-plt.imshow(nii_img[:,:,iFileToTest-1],  cmap=plt.cm.gray) # -1 to match counting of filenames
-
-
-# %%
-print(dcmTest.pixel_array.shape)
-print(dcmTest.Rows, dcmTest.Columns)
-plt.imshow(dcmTest.pixel_array,  cmap=plt.cm.gray)
-
-
-# %%
-dcmTest
-print(round(nii_parameters['dimX'],2))
 
 
