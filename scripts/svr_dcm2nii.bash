@@ -21,10 +21,11 @@
 #PATH="$PATH:/home/MIRTK/build/bin:/home/MIRTK/build/lib/tools" # within Docker container
 
 # Setup
-inFolder=/mnt/c/TempInputSeries/
-dcmFolder=/mnt/c/TempInputSeries/DICOM/
-niiFolder=/mnt/c/TempInputSeries/nii/
-outFolder=/mnt/c/svrtk-docker-gpu/recon/
+svrtkDockerDir=/mnt/c/svrtk-docker-gpu
+inFolder=$svrtkDockerDir/pride/TempInputSeries/
+dcmFolder=$svrtkDockerDir/pride/TempInputSeries/DICOM/
+niiFolder=$svrtkDockerDir/pride/TempInputSeries/nii/
+outFolder=$svrtkDockerDir/recon/
 mkdir $niiFolder
 
 # Unpack dicoms

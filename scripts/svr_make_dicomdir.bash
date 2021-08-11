@@ -17,11 +17,13 @@
 echo
 echo "Creating DICOMDIR ..."
 
-mkdir /mnt/c/TempOutputSeries/tempDir
-mv /mnt/c/TempOutputSeries/DICOM /mnt/c/TempOutputSeries/tempDir/DICOM
-cd /mnt/c/TempOutputSeries
+prideDir=/mnt/c/svrtk-docker-gpu/pride
+
+mkdir $prideDir/TempOutputSeries/tempDir
+mv $prideDir/TempOutputSeries/DICOM $prideDir/TempOutputSeries/tempDir/DICOM
+cd $prideDir/TempOutputSeries
 /usr/bin/dcmmkdir +id 'tempDir' +r
-mv /mnt/c/TempOutputSeries/tempDir/DICOM /mnt/c/TempOutputSeries
+mv $prideDir/TempOutputSeries/tempDir/DICOM $prideDir/TempOutputSeries
 rm -r tempDir
 
 echo "DICOMDIR created."

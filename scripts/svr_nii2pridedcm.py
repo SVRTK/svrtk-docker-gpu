@@ -26,9 +26,9 @@ from pydicom.datadict import DicomDictionary, keyword_dict
 from pydicom.sequence import Sequence
 
 # %%
-dcmInPath = r'/mnt/c/svrtk-docker-gpu-dev/pride/TempInputSeries/DICOM/IM_0001'
-niiInPath = r'/mnt/c/svrtk-docker-gpu-dev/recon/SVR-output.nii.gz'
-dcmOutPath = r'/mnt/c/svrtk-docker-gpu-dev/pride/TempOutputSeries/DICOM'
+dcmInPath = r'/mnt/c/svrtk-docker-gpu/pride/TempInputSeries/DICOM/IM_0001'
+niiInPath = r'/mnt/c/svrtk-docker-gpu/recon/SVR-output.nii.gz'
+dcmOutPath = r'/mnt/c/svrtk-docker-gpu/pride/TempOutputSeries/DICOM'
 
 if not os.path.exists( dcmOutPath ):
     os.makedirs( dcmOutPath )
@@ -53,7 +53,7 @@ new_dict_items = {
     0x20011025: ('SH', '1', "Echo Time Display MR", '', 'EchoTimeDisplayMR'),
     0x20011060: ('SL', '1', "Number Of Stacks", '', 'NumberOfStacks'),
     0x20011063: ('CS', '1', "Examination Source", '', 'ExaminationSource'),
-    #0x2001107b: ('IS', '1', "Acquisition Number", '', 'AcquisitionNumber'),
+    # 0x2001107b: ('IS', '1', "Acquisition Number", '', 'AcquisitionNumber'), # Philips Private alternative
     0x20011081: ('IS', '1', "Number Of Dynamic Scans", '', 'NumberOfDynamicScans'),
     0x2001101a: ('FL', '3', "PC Velocity", '', 'PCVelocity'),
     0x2001101d: ('IS', '1', "Reconstruction Number MR", '', 'ReconstructionNumberMR'),
@@ -161,16 +161,32 @@ def get_nii_parameters(niiIn):
     zLocLast = (voxelSpacing * nZ) - voxelSpacing
     sliceLoca = np.repeat( np.linspace(0, zLocLast, num=nZ), nF)
 
-    # TODO: windowing
-    # windowCenter = []
-    # windowWidth = []
-    # rescaleIntercept = []
-    # rescaleSlope = []
+    # Windowing
+    maxI = np.amax(nii_img)
+    minI = np.amin(nii_img)
+    windowCenter = round( (np.amax(nii_img)-np.amin(nii_img))/2 )
+    windowWidth = round( np.amax(nii_img)-np.amin(nii_img) )
+    rescaleIntercept = 0
+    rescaleSlope = 1
+    
+    # FOV
+    fovX = nX * dimX
+    fovY = nY * dimY
+    fovZ = nZ * dimZ
+
+    # print("Max I =", maxI)
+    # print("Min I =", minI)
+    # print("Window Center =", windowCenter )
+    # print("Window Width =", windowWidth )
 
     # print("dimX =", dimX)
     # print("dimY =", dimY)
     # print("round dimX =", round(dimX,2))
     # print("round dimY =", round(dimY,2))
+
+    # print("FOVx =", fovX)
+    # print("FOVy =", fovY)
+    # print("FOVz =", fovZ)
 
     # nii parameters to transfer to dicom
     nii_parameters = {
@@ -185,13 +201,64 @@ def get_nii_parameters(niiIn):
         'Columns': nY,
         'NumberOfSlices': nZ,
         'PixelSpacing': [dimX, dimY],
-        'WindowCenter': str(1000),
-        'WindowWidth': str(1800),
-        'RescaleIntercept': str(0),
-        'RescaleSlope': str(21),
+        'FOV': [fovX, fovY, fovZ],
+        'WindowCenter': str(windowCenter),
+        'WindowWidth': str(windowWidth),
+        'RescaleIntercept': str(rescaleIntercept),
+        'RescaleSlope': str(rescaleSlope),
     }
 
     return nii_parameters
+
+
+# %%
+def dcm_make_geometry_tags(ds, nii, sliceNumber):
+    
+    ### Creates Geometry tags from nifti affine
+    #
+    # INPUT:
+    # - ds: Existing Dicom DataSet
+    # - nii: nifti containing affine
+    # - sliceNumber: slice number (counting from 1)
+    #
+
+    def fnT1N(A,N):
+        # Subfn: calculate T1N vector
+        # A = affine matrix [4x4]
+        # N = slice number (counting from 1)
+        T1N = A.dot([[0], [0], [N-1], [1]])
+        return T1N
+
+    # data parameters & pixel dimensions
+    nX  = nii.header['dim'][1]
+    nY  = nii.header['dim'][2]
+    nSl = nii.header['dim'][3]
+    
+    dimX = nii.header['pixdim'][1]
+    dimY = nii.header['pixdim'][2]
+    dimZ = nii.header['pixdim'][3]
+    dimF = nii.header['pixdim'][4]
+
+    # direction cosines & position parameters
+    # nb: -1 for dir cosines matches cine_vol nifti in ITK-Snap
+    A = nii.affine
+    dircosX = -1 * A[:3,0] / dimX
+    dircosY = -1 * A[:3,1] / dimY
+    T1N = fnT1N(A, sliceNumber)
+
+    # print('A =', A)
+    # print('dircosX =', dircosX)
+    # print('dircosX =', dircosY)
+    # print('dircosXY = ', [dircosX[0], dircosX[1], dircosX[2], dircosY[0], dircosY[1], dircosY[2]] )
+    # print('T1N = ', T1N)
+
+    # Dicom Tags
+    ds.SpacingBetweenSlices = round(float(dimZ),2)
+    ds.ImagePositionPatient = [T1N[0],T1N[1],T1N[2]]
+    # ds.ImageOrientationPatient = [dircosX[0], dircosX[1], dircosX[2], dircosY[0], dircosY[1], dircosY[2]]
+    ds.ImageOrientationPatient = [dircosY[0], dircosY[1], dircosY[2], dircosX[0], dircosX[1], dircosX[2]] # matches cine_vol nifti in ITK-Snap
+
+    return ds
 
 
 # %%
@@ -228,7 +295,7 @@ def elem_initialise(uid_instance, uid_series_instance, uid_frame_of_reference, n
         'SOPInstanceUID': uid_instance,                                     # per slice
         'Manufacturer': 'Philips Medical Systems',
         'SliceThickness': nii_parameters['SliceThickness'],                 # per SVR
-        'SpacingBetweenSlices': nii_parameters['SpacingBetweenSlices'],     # per SVR
+        'SpacingBetweenSlices': round(float(nii_parameters['SpacingBetweenSlices']),2),     # per SVR
         'ProtocolName': 'SVR_PRIDE_RESEARCH_RECON',
         'MRAcquisitionType': '3D',
         # 'AcquisitionMatrix': nii_parameters['AcquisitionMatrix'],         # per SVR
@@ -237,7 +304,7 @@ def elem_initialise(uid_instance, uid_series_instance, uid_frame_of_reference, n
         'InstanceNumber': nii_parameters['InstanceNumber'],                 # per slice
         'ImageOrientationPatient': ['1','0','0','0','1','0'],
         #'ImagePositionPatient': [str(0),str(0),str(nii_parameters['SliceLocation'])],  # old, think broken - all args shd be constant between slices
-        'ImagePositionPatient': [str(50),str(-60),str(60)],
+        'ImagePositionPatient': [str(0),str(0),str(0)],
         'FrameOfReferenceUID': uid_frame_of_reference,                      # per SVR
         'TemporalPositionIdentifier': '1',
         'NumberOfTemporalPositions': '1',
@@ -419,9 +486,9 @@ def create_seq_stack():
     setattr(stack_code, 'MRStackAngulationAP', 0 )
     setattr(stack_code, 'MRStackAngulationFH', 0 )
     setattr(stack_code, 'MRStackAngulationRL', 0 )
-    setattr(stack_code, 'MRStackFovAP', 124.1 )                 # todo: calculate based on SVR
-    setattr(stack_code, 'MRStackFovFH', 108.8 )                 # todo: calculate based on SVR
-    setattr(stack_code, 'MRStackFovRL', 85 )
+    setattr(stack_code, 'MRStackFovAP', nii_parameters['FOV'][0] ) # fovX
+    setattr(stack_code, 'MRStackFovFH', nii_parameters['FOV'][1] ) # fovY
+    setattr(stack_code, 'MRStackFovRL', nii_parameters['FOV'][2] ) # fovZ
     setattr(stack_code, 'MRStackOffcentreAP', 0 )
     setattr(stack_code, 'MRStackOffcentreFH', 0 )
     setattr(stack_code, 'MRStackOffcentreRL', 0 )
@@ -500,7 +567,10 @@ for iInstance in range(0,nInstances):
     setattr(ds, 'NumberOfSlicesMR', nInstances )
     setattr(ds, 'SliceNumberMR', nii_parameters['InstanceNumber'] )
 
-    # Add "Stack" sequence to dataset
+    # Update Geometry
+    dcm_make_geometry_tags(ds, niiIn, iInstance+1)
+
+    # Add Stack Sequence to dataset
     create_seq_stack()
 
     # Overrides for Matthew

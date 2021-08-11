@@ -1,25 +1,12 @@
-
-### svrtk-docker-gpu
+### svrtk-docker-gpu Dockerfile
 #
-# INSTALLATION INSTRUCTIONS
-#
-# 1) Download svrtk-docker-gpu package to C: drive
-#		i.e.: C:\svrtk-docker-gpu
-# 2) Open WSL2 terminal, navigate to directory: 
-#		cd /mnt/c/svrtk-docker-gpu
-# 3) To build SVRTK Docker GPU container using this Dockerfile:
-#		docker build -t svrtk-docker-gpu -f svrtk-docker-gpu.Dockerfile .
-# 4) To run SVRTK Docker GPU container:
-#		docker run --gpus all -it -v "/mnt/c/svrtk-docker-gpu":/home/ svrtk-docker-gpu /home/scripts/docker-recon-brain.sh /home/cnn_test_case
-#			OR interactively:
-#		docker run --gpus all -it -v "/mnt/c/svrtk-docker-gpu":/home/ svrtk-docker-gpu	
+#   - Requires Git repo download from: https://github.com/SVRTK/svrtk-docker-gpu
 #
 #	Tom Roberts (t.roberts@kcl.ac.uk)
 #
 ########################################
 
 # Base image
-#  - nb: conda/pip preconfigured
 FROM pytorch/pytorch:1.9.0-cuda11.1-cudnn8-devel
 
 # Set working directory
