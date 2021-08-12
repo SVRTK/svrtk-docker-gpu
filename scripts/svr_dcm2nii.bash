@@ -18,21 +18,18 @@
 #
 ###########################################################
 
-#PATH="$PATH:/home/MIRTK/build/bin:/home/MIRTK/build/lib/tools" # within Docker container
 
 # Setup
-svrtkDockerDir=/mnt/c/svrtk-docker-gpu
-inFolder=$svrtkDockerDir/pride/TempInputSeries/
-dcmFolder=$svrtkDockerDir/pride/TempInputSeries/DICOM/
-niiFolder=$svrtkDockerDir/pride/TempInputSeries/nii/
-outFolder=$svrtkDockerDir/recon/
+inFolder=/home/recon/pride/TempInputSeries/
+dcmFolder=/home/recon/pride/TempInputSeries/DICOM/
+niiFolder=/home/recon/pride/TempInputSeries/nii/
+outFolder=/home/recon/
 mkdir $niiFolder
 
-# Unpack dicoms
-#dcm2niix -z y -o $niiFolder -f %t_%v_%s_%p $inFolder
 
-# Unpack dicoms using dcm2niix development branch - see: https://github.com/rordenlab/dcm2niix/issues/529
-/home/tr17/reconstruction-software/dcm2niix/build/bin/dcm2niix -z y -o $niiFolder -f %t_%v_%s_%p $inFolder
+# Unpack DICOMs 
+# - using dcm2niix development branch - see: https://github.com/rordenlab/dcm2niix/issues/529
+dcm2niix -z y -o $niiFolder -f %t_%v_%s_%p $inFolder
 
 
 # Rename nifti files, move to SVR folder
@@ -55,7 +52,7 @@ stackFileNumberCtr=1
 while [ $iF -lt `expr $numNiiFiles` ] ; do
 	
 	# save dynamics as separate nifti
-	/home/tr17/reconstruction-software/MIRTK/build/bin/mirtk extract-image-region ${niiFilenames[$iF]} stk.nii.gz -split t
+	mirtk extract-image-region ${niiFilenames[$iF]} stk.nii.gz -split t
 	
 	stackFilenames=(`ls stk*.nii.gz`)
 	numStackFiles=`ls stk*.nii.gz | wc -l`

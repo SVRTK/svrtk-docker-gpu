@@ -17,7 +17,8 @@
 echo
 echo "Creating DICOMDIR ..."
 
-prideDir=/mnt/c/svrtk-docker-gpu/pride
+# prideDir=/mnt/c/svrtk-docker-gpu/recon/pride # local paths
+prideDir=/home/recon/pride # container paths
 
 mkdir $prideDir/TempOutputSeries/tempDir
 mv $prideDir/TempOutputSeries/DICOM $prideDir/TempOutputSeries/tempDir/DICOM

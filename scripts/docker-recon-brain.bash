@@ -324,6 +324,10 @@ do
 	test_file=${main_dir}/${roi_recon[j]}-output.nii.gz
 	if [[ -f ${test_file} ]];then
 
+		# TAR - pad to cuboid for Philips import
+		cp ${main_dir}/${roi_recon[j]}-output.nii.gz ${main_dir}/${roi_recon[j]}-output-withoutPadding.nii.gz
+		${mirtk_path}/mirtk resample-image ${main_dir}/${roi_recon[j]}-output.nii.gz ${main_dir}/${roi_recon[j]}-output.nii.gz -imsize 180 180 180
+		
 		echo "Reconstruction was successful: " ${roi_recon[j]}-output.nii.gz
 
 	else 

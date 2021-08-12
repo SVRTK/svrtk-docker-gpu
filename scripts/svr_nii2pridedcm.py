@@ -25,10 +25,16 @@ from pydicom.dataset import Dataset, FileDataset, FileMetaDataset
 from pydicom.datadict import DicomDictionary, keyword_dict
 from pydicom.sequence import Sequence
 
-# %%
-dcmInPath = r'/mnt/c/svrtk-docker-gpu/pride/TempInputSeries/DICOM/IM_0001'
-niiInPath = r'/mnt/c/svrtk-docker-gpu/recon/SVR-output.nii.gz'
-dcmOutPath = r'/mnt/c/svrtk-docker-gpu/pride/TempOutputSeries/DICOM'
+# # %% Local paths
+# dcmInPath = r'/mnt/c/svrtk-docker-gpu/recon/pride/TempInputSeries/DICOM/IM_0001'
+# niiInPath = r'/mnt/c/svrtk-docker-gpu/recon/SVR-output.nii.gz'
+# dcmOutPath = r'/mnt/c/svrtk-docker-gpu/recon/pride/TempOutputSeries/DICOM'
+
+# %% Docker container paths
+dcmInPath = r'/home/recon/pride/TempInputSeries/DICOM/IM_0001'
+niiInPath = r'/home/recon/SVR-output.nii.gz'
+dcmOutPath = r'/home/recon/pride/TempOutputSeries/DICOM'
+
 
 if not os.path.exists( dcmOutPath ):
     os.makedirs( dcmOutPath )
