@@ -1,7 +1,7 @@
 @echo off
 
 :: Docker image name (default: svrtk-docker-gpu)
-set "dockerImageName=svrtk-docker-deploy-test2"
+set "dockerImageName=svrtk-docker-gpu"
 echo Using Docker Image: %dockerImageName%
 
 :: Convert DICOMs from PRIDE to nifti, and, copy to recon folder
