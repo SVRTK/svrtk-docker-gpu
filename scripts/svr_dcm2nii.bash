@@ -24,6 +24,7 @@ inFolder=/home/recon/pride/TempInputSeries/
 dcmFolder=/home/recon/pride/TempInputSeries/DICOM/
 niiFolder=/home/recon/pride/TempInputSeries/nii/
 outFolder=/home/recon/
+getParametersScript=/home/scripts/svr_getparameters.bash
 mkdir $niiFolder
 
 
@@ -31,6 +32,8 @@ mkdir $niiFolder
 # - using dcm2niix development branch - see: https://github.com/rordenlab/dcm2niix/issues/529
 dcm2niix -z y -o $niiFolder -f %t_%v_%s_%p $inFolder
 
+# Get Parameters
+bash $getParametersScript
 
 # Rename nifti files, move to SVR folder
 cd $niiFolder

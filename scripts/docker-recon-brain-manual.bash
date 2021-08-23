@@ -35,8 +35,13 @@ current_lab=1
 #CHANGE BACK TO 4 AFTER TESTING !!!!
 num_packages=1
 
-#AUTOMATICALLY GUESS
-default_thickness=2.5
+# TODO: implement check in case slice thickness inconsistent across stacks
+if [[ -f "${default_recon_dir}/log_slice_thickness.txt" ]]; then
+	default_thickness=`cat "${default_recon_dir}/log_slice_thickness.txt" | awk -F' ' '{print $1}'`
+else
+	echo "WARNING: Setting default_thickness = 2.5"
+	default_thickness=2.5
+fi
 
 #FOR TESTING ONLY - CHANGE TO 0.85 AFTER TESTING
 output_resolution=0.85
