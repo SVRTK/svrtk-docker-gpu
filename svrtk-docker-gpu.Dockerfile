@@ -53,6 +53,9 @@ COPY /Segmentation_FetalMRI /home/Segmentation_FetalMRI
 # Copy Pre-trained Model Weights
 COPY /Segmentation_FetalMRI/trained-models /home/Segmentation_FetalMRI/trained-models
 
+# Copy Reorientation Templates
+COPY /Segmentation_FetalMRI/reference-templates /home/Segmentation_FetalMRI/reference-templates
+
 # Pip
 RUN python -m pip install -r /home/Segmentation_FetalMRI/requirements.txt
 

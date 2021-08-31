@@ -3,7 +3,7 @@
 
 echo
 echo "-----------------------------------------------------------------------------"
-echo "RUNNING AUTOMATED SVR RECONSTRCTION"
+echo "RUNNING AUTOMATED SVR RECONSTRUCTION"
 echo "-----------------------------------------------------------------------------"
 echo
 
@@ -14,8 +14,11 @@ default_recon_dir=$1
 # Paths
 mirtk_path=/home/MIRTK/build/bin
 segm_path=/home/Segmentation_FetalMRI
+template_path=/home/Segmentation_FetalMRI/reference-templates
 check_path_brain=/home/Segmentation_FetalMRI/trained-models/checkpoints-brain-loc-labels
 check_path_brain_cropped=/home/Segmentation_FetalMRI/trained-models/checkpoints-brain-loc-labels-cropped
+check_path_roi_reo_4lab=/home/Segmentation_FetalMRI/trained-models/checkpoints-brain-reorientation
+
 
 
 test_dir=${default_recon_dir}
@@ -47,7 +50,7 @@ else
 fi
 
 #FOR TESTING ONLY - CHANGE TO 0.85 AFTER TESTING
-output_resolution=0.85
+output_resolution=1
 
 
 
@@ -326,12 +329,85 @@ do
 	${mirtk_path}/mirtk reconstruct ${main_dir}/${roi_recon[j]}-output.nii.gz  ${nStacks} proc-stacks/*.nii* -mask average_mask_cnn.nii.gz -template selected_template.nii.gz -default_thickness ${default_thickness} -svr_only -remote -iterations 3 -structural -resolution ${output_resolution}
 	
 	
-	test_file=${main_dir}/${roi_recon[j]}-output.nii.gz
+ 
+     echo
+     echo "-----------------------------------------------------------------------------"
+     echo
+     
+    
+     
+     echo
+     echo "RUNNING REORIENTATION ..."
+     echo
+
+     cd ${main_dir}
+
+     reo_roi_ids=(1 2 3 4)
+     lab_start=(1 2 1 4)
+     lab_stop=(1 2 4 4)
+     lab_cc=(2 2 1 1)
+
+     # 1 - front WM, 2 - back WM, 3 - bet, 4 - cerebellum
+
+     mkdir dofs-to-atl
+     mkdir in-recon-file
+	 mkdir final-reo-mask-files
+     
+     cp ${main_dir}/${roi_recon[j]}-output.nii.gz in-recon-file
+
+     res=128
+     all_num_lab=4
+     cnn_out_mode=1234
+     ${mirtk_path}/mirtk prepare-for-cnn recon-res-files recon-stack-files run.csv run-info-summary.csv ${res} 1 in-recon-file/*nii*  ${all_num_lab} 0
+     mkdir ${main_dir}/reo-${cnn_out_mode}-cnn-out-files
+     rm ${main_dir}/reo-${cnn_out_mode}-cnn-out-files/*
+	 PYTHONIOENCODING=utf-8 python ${segm_path}/run_cnn_loc.py ${segm_path}/ ${check_path_roi_reo_4lab} ${main_dir}/ ${main_dir}/reo-${cnn_out_mode}-cnn-out-files/ run.csv ${res} ${all_num_lab}
+
+    jj=1000
+
+    for ((w=0;w<${#reo_roi_ids[@]};w++));
+    do
+        current_lab=${reo_roi_ids[$w]}
+        s1=${lab_start[$w]}
+        s2=${lab_stop[$w]}
+        currenct_cc=${lab_cc[$w]}
+        ${mirtk_path}/mirtk extract-label ${main_dir}/reo-${cnn_out_mode}-cnn-out-files/*-${jj}_seg_pr*.nii* tmp-org-m.nii.gz ${s1} ${s2}
+        ${mirtk_path}/mirtk extract-connected-components tmp-org-m.nii.gz tmp-org-m.nii.gz -n ${currenct_cc}
+        cp tmp-org-m.nii.gz final-reo-mask-files/mask-${jj}-${current_lab}.nii.gz
+
+    done
+
+
+    ${mirtk_path}/mirtk init-dof init.dof
+
+    z1=1
+    z2=2
+    z3=3
+    z4=4
+
+    ${mirtk_path}/mirtk register_landmarks ${template_path}/brain-ref-atlas-2021/new-brain-templ.nii.gz final-reo-mask-files/mask-${jj}-0.nii.gz  init.dof dofs-to-atl/dof-to-atl-${jj}.dof 4 4 ${template_path}/brain-ref-atlas-2021/mask-${z1}.nii.gz ${template_path}/brain-ref-atlas-2021/mask-${z2}.nii.gz ${template_path}/brain-ref-atlas-2021/mask-${z3}.nii.gz ${template_path}/brain-ref-atlas-2021/mask-${z4}.nii.gz final-reo-mask-files/mask-${jj}-${z1}.nii.gz final-reo-mask-files/mask-${jj}-${z2}.nii.gz final-reo-mask-files/mask-${jj}-${z3}.nii.gz final-reo-mask-files/mask-${jj}-${z4}.nii.gz
+
+
+     ${mirtk_path}/mirtk transform-image ${main_dir}/${roi_recon[j]}-output.nii.gz ${main_dir}/reo-${roi_recon[j]}-output.nii.gz -dofin dofs-to-atl/dof-to-atl-${jj}.dof -target ${template_path}/brain-ref-atlas-2021/ref-space-brain.nii.gz -interp BSpline
+
+     ${mirtk_path}/mirtk crop_volume ${main_dir}/reo-${roi_recon[j]}-output.nii.gz ${main_dir}/reo-${roi_recon[j]}-output.nii.gz ${main_dir}/reo-${roi_recon[j]}-output.nii.gz
+
+
+     echo
+     echo "-----------------------------------------------------------------------------"
+     echo
+ 
+ 
+	test_file=${main_dir}/reo-${roi_recon[j]}-output.nii.gz
 	if [[ -f ${test_file} ]];then
 
 		# TAR - pad to cuboid for Philips import
-		cp ${main_dir}/${roi_recon[j]}-output.nii.gz ${main_dir}/${roi_recon[j]}-output-withoutPadding.nii.gz
-		${mirtk_path}/mirtk resample-image ${main_dir}/${roi_recon[j]}-output.nii.gz ${main_dir}/${roi_recon[j]}-output.nii.gz -imsize 180 180 180
+		cp ${main_dir}/reo-${roi_recon[j]}-output.nii.gz ${main_dir}/reo-${roi_recon[j]}-output-withoutPadding.nii.gz
+		${mirtk_path}/mirtk resample-image ${main_dir}/reo-${roi_recon[j]}-output.nii.gz ${main_dir}/reo-${roi_recon[j]}-output.nii.gz -imsize 180 180 180
+		
+		# TAR - rename files
+		mv ${main_dir}/${roi_recon[j]}-output.nii.gz ${roi_recon[j]}-output-withoutReorientation.nii.gz
+		cp ${main_dir}/reo-${roi_recon[j]}-output.nii.gz ${main_dir}/${roi_recon[j]}-output.nii.gz
 		
 		echo "Reconstruction was successful: " ${roi_recon[j]}-output.nii.gz
 

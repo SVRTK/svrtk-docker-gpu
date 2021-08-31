@@ -66,7 +66,7 @@ It should output the MIRTK usage instructions.
 
 ## Usage
 
-#### 1. Run automated SVR:
+#### Option 1 --- Run automated SVR [requires CUDA-compatible GPU with 12GB memory]:
 
 Copy nifti files (labelled `stack1.nii.gz`, `stack2.nii.gz`, ... `stackN.nii.gz`) into the `svrtk-docker-gpu/recon` folder.
 
@@ -74,7 +74,22 @@ Then:
 
 ```
 $ cd svrtk-docker-gpu
-$ docker run --gpus all -it -v "svrtk-docker-gpu/recon":/home/recon svrtk-docker-gpu /home/scripts/docker-recon-brain.sh /home/recon
+$ docker run --gpus all -it -v "svrtk-docker-gpu/recon":/home/recon svrtk-docker-gpu /home/scripts/docker-recon-brain-auto.bash /home/recon
+```
+
+This will output a 3D SVR-reconstructed volume named `SVR-output.nii.gz`.
+
+#### Option 2 --- Run manual SVR:
+
+Copy nifti files (labelled `stack1.nii.gz`, `stack2.nii.gz`, ... `stackN.nii.gz`) into the `svrtk-docker-gpu/recon` folder.
+
+Draw a brain mask on one of the stacks and save as `mask-stackN.nii.gz` (where `N` = number of segmented stack) in the `svrtk-docker-gpu/recon` folder.
+
+Then:
+
+```
+$ cd svrtk-docker-gpu
+$ docker run --gpus all -it -v "svrtk-docker-gpu/recon":/home/recon svrtk-docker-gpu /home/scripts/docker-recon-brain-manual.bash /home/recon
 ```
 
 This will output a 3D SVR-reconstructed volume named `SVR-output.nii.gz`.
