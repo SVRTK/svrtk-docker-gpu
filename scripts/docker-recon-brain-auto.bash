@@ -403,7 +403,8 @@ do
 
 		# TAR - pad to cuboid for Philips import
 		cp ${main_dir}/reo-${roi_recon[j]}-output.nii.gz ${main_dir}/reo-${roi_recon[j]}-output-withoutPadding.nii.gz
-		${mirtk_path}/mirtk resample-image ${main_dir}/reo-${roi_recon[j]}-output.nii.gz ${main_dir}/reo-${roi_recon[j]}-output.nii.gz -imsize 180 180 180
+		# ${mirtk_path}/mirtk resample-image ${main_dir}/reo-${roi_recon[j]}-output.nii.gz ${main_dir}/reo-${roi_recon[j]}-output.nii.gz -imsize 180 180 180
+		${mirtk_path}/mirtk pad-3d ${main_dir}/reo-${roi_recon[j]}-output-withoutPadding.nii.gz ${main_dir}/reo-${roi_recon[j]}-output.nii.gz 200 1
 		
 		# TAR - rename files
 		mv ${main_dir}/${roi_recon[j]}-output.nii.gz ${roi_recon[j]}-output-withoutReorientation.nii.gz
