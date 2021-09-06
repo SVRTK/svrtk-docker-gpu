@@ -50,7 +50,7 @@ else
 fi
 
 #FOR TESTING ONLY - CHANGE TO 0.85 AFTER TESTING
-output_resolution=1
+output_resolution=0.85
 
 
 
