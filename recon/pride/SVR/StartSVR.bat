@@ -17,8 +17,6 @@ ECHO Converting DICOMs to nifti ...
 wsl.exe docker run --gpus all -it -v "/mnt/c/svrtk-docker-gpu/recon":/home/recon %dockerImageName% /home/scripts/svr_dcm2nii.bash > C:\svrtk-docker-gpu\recon\pride\logs\log_svr_dcm2nii.txt
 ECHO DONE
 
-PAUSE
-
 :: Run SVRTK GPU Docker reconstruction
 ECHO Running SVR reconstruction ...
 wsl.exe docker run --gpus all -it -v "/mnt/c/svrtk-docker-gpu/recon":/home/recon %dockerImageName% /home/scripts/docker-recon-brain-auto.bash /home/recon/ > C:\svrtk-docker-gpu\recon\pride\logs\log_svrtk_docker_gpu.txt
