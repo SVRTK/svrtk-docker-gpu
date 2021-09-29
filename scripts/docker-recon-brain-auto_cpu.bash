@@ -161,7 +161,7 @@ main_dir=$(pwd)
 
 
 
-PYTHONIOENCODING=utf-8 python ${segm_path}/run_cnn_loc_gpu_cpu.py ${segm_path}/ ${check_path_brain}/ ${main_dir}/ ${main_dir}/cnn-out-files/ run.csv ${res} ${all_num_lab} 1
+PYTHONIOENCODING=utf-8 python ${segm_path}/run_cnn_loc_gpu_cpu.py ${segm_path}/ ${check_path_brain}/ ${main_dir}/ ${main_dir}/cnn-out-files/ run.csv ${res} ${all_num_lab} -1
 
 
 
@@ -214,7 +214,7 @@ ${mirtk_path}/mirtk prepare-for-cnn cropped-cnn-recon-res-files cropped-cnn-reco
 
 
 
-PYTHONIOENCODING=utf-8 python ${segm_path}/run_cnn_loc_gpu_cpu.py ${segm_path}/ ${check_path_brain_cropped}/ ${main_dir}/ ${main_dir}/cropped-cnn-out-files/ cropped-run.csv ${res} ${all_num_lab} 1
+PYTHONIOENCODING=utf-8 python ${segm_path}/run_cnn_loc_gpu_cpu.py ${segm_path}/ ${check_path_brain_cropped}/ ${main_dir}/ ${main_dir}/cropped-cnn-out-files/ cropped-run.csv ${res} ${all_num_lab} -1
 
 
 
