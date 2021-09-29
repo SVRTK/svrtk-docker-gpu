@@ -361,7 +361,7 @@ do
      ${mirtk_path}/mirtk prepare-for-cnn recon-res-files recon-stack-files run.csv run-info-summary.csv ${res} 1 in-recon-file/*nii*  ${all_num_lab} 0
      mkdir ${main_dir}/reo-${cnn_out_mode}-cnn-out-files
      rm ${main_dir}/reo-${cnn_out_mode}-cnn-out-files/*
-	 PYTHONIOENCODING=utf-8 python ${segm_path}/run_cnn_loc.py ${segm_path}/ ${check_path_roi_reo_4lab} ${main_dir}/ ${main_dir}/reo-${cnn_out_mode}-cnn-out-files/ run.csv ${res} ${all_num_lab}
+	 PYTHONIOENCODING=utf-8 python ${segm_path}/run_cnn_loc_gpu_cpu.py ${segm_path}/ ${check_path_roi_reo_4lab} ${main_dir}/ ${main_dir}/reo-${cnn_out_mode}-cnn-out-files/ run.csv ${res} ${all_num_lab} -1
 
     jj=1000
 
