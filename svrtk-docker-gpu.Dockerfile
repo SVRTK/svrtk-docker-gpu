@@ -50,6 +50,9 @@ ENV PATH="$PATH:/home/MIRTK/build/bin:/home/MIRTK/build/lib/tools"
 COPY /scripts /home/scripts
 COPY /Segmentation_FetalMRI /home/Segmentation_FetalMRI
 
+# Set Executable Permissions
+RUN chmod +x /home/scripts/*
+
 # Copy Pre-trained Model Weights
 COPY /Segmentation_FetalMRI/trained-models /home/Segmentation_FetalMRI/trained-models
 
@@ -58,4 +61,3 @@ COPY /Segmentation_FetalMRI/reference-templates /home/Segmentation_FetalMRI/refe
 
 # Pip
 RUN python -m pip install -r /home/Segmentation_FetalMRI/requirements.txt
-
