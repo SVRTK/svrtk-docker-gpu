@@ -33,6 +33,12 @@ docker run -it -v "/home/$userName/$dockerImageName/recon":/home/recon $dockerIm
 docker run -it -v "/home/$userName/$dockerImageName/recon":/home/recon $dockerImageName /home/scripts/svr_make_dicomdir.bash >> /home/$userName/$dockerImageName/recon/pride/logs/log_svr_nii2pridedcm.txt
 echo "DONE"
 
+# Change Recon Directory Permissions in Container to Match Host User
+uid=$(id -u)
+gid=$(id -g)
+docker run -it -v "/home/$userName/$dockerImageName/recon":/home/recon $dockerImageName bash -c "chown -R $uid:$gid /home/recon"
+docker run -it -v "/home/$userName/$dockerImageName/recon":/home/recon $dockerImageName bash -c "chmod -R 1775 /home/recon"
+
 # Save Recon Directory
 echo "Saving recon directory ..."
 /home/$userName/$dockerImageName/scripts/reconDirSave.bash
