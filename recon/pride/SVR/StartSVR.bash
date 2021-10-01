@@ -7,7 +7,7 @@ userName=$USER
 
 # Docker image name (default: svrtk-docker-gpu)
 dockerImageName=svrtk-docker-gpu
-echo "Using Docker Image:"$dockerImageName
+echo "Using Docker Image:" $dockerImageName
 
 # Clear TempOutputSeries
 echo "Cleaning TempOutputSeries DICOMs ..."
