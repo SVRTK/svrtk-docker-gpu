@@ -36,8 +36,12 @@ patientFolder=$scanDate/$patID
 echo "Copying to ... "$remoteHost":"$remoteDir/$patientFolder
 
 ssh $remoteUser@$remoteHost "mkdir -p $remoteDir/$patientFolder"
+ssh $remoteUser@$remoteHost "chmod -R 1775 $remoteDir/$scanDate" # Set sticky bits for other users
+
 # rsync -r $reconFolder/* $remoteUser@$remoteHost:$remoteDir/$patientFolder		REM entire folder (unnecessary)
 rsync -r $reconFolder/SVR-output.nii.gz $remoteUser@$remoteHost:$remoteDir/$patientFolder
 rsync -r $reconFolder/stack*.nii.gz $remoteUser@$remoteHost:$remoteDir/$patientFolder
 rsync -r $reconFolder/pride/logs $remoteUser@$remoteHost:$remoteDir/$patientFolder
 rsync -r $reconFolder/log_slice_thickness.txt $remoteUser@$remoteHost:$remoteDir/$patientFolder/logs
+
+
