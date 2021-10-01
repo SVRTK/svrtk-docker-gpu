@@ -34,10 +34,12 @@ docker run -it -v "/home/$userName/$dockerImageName/recon":/home/recon $dockerIm
 echo "DONE"
 
 # Change Recon Directory Permissions in Container to Match Host User
+echo "Adjusting recon directory permissions ..."
 uid=$(id -u)
 gid=$(id -g)
 docker run -it -v "/home/$userName/$dockerImageName/recon":/home/recon $dockerImageName bash -c "chown -R $uid:$gid /home/recon"
 docker run -it -v "/home/$userName/$dockerImageName/recon":/home/recon $dockerImageName bash -c "chmod -R 1775 /home/recon"
+echo "DONE"
 
 # Save Recon Directory
 echo "Saving recon directory ..."

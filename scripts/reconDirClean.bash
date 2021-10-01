@@ -4,7 +4,6 @@
 
 userName=$USER
 dockerImageName=svrtk-docker-gpu
-echo "Using Docker Image:"$dockerImageName
 
 # Create fresh pride/recon dirs
 echo "Cleaning recon folder ..."
@@ -16,7 +15,8 @@ cp -r /home/$userName/$dockerImageName/recon /home/$userName/$dockerImageName/re
 rm -rf /home/$userName/$dockerImageName/recon
 
 # Rebuild pride/pride dir
-cp -r /home/$userName/$dockerImageName/recon-tmp/pride /home/$userName/$dockerImageName/recon/pride
+mkdir -p /home/$userName/$dockerImageName/recon/pride
+cp -r /home/$userName/$dockerImageName/recon-tmp/pride/* /home/$userName/$dockerImageName/recon/pride
 
 # Remove old logs
 rm /home/$userName/$dockerImageName/recon/pride/logs/*.txt

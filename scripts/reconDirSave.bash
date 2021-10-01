@@ -4,7 +4,6 @@
 
 userName=$USER
 dockerImageName=svrtk-docker-gpu
-echo "Using Docker Image:"$dockerImageName
 
 # Archive reconstruction (limit to 1)
 rm -rf /home/$userName/$dockerImageName/previous-recon
