@@ -31,7 +31,3 @@ rm -f /home/$userName/$dockerImageName/recon/pride/TempInputSeries/DICOMDIR
 rm -rf /home/$userName/$dockerImageName/recon-tmp
 
 echo "DONE"
-
-# Archive reconstruction (limit to 1)
-rm -rf /home/$userName/$dockerImageName/previous-recon
-cp -r /home/$userName/$dockerImageName/recon /home/$userName/$dockerImageName/previous-recon
