@@ -12,11 +12,29 @@
 #
 ###########################################################
 
+# Check WSL or Linux
+if cat /proc/version | grep Microsoft; then
+   isWSL=true
+else
+   isWSL=false
+fi
+
 
 # Setup
-reconFolder=/mnt/c/svrtk-docker-gpu/recon
-dicomFolder=/mnt/c/svrtk-docker-gpu/recon/pride/TempInputSeries/DICOM
+# if [ $(hostname) = "pridesvr02-pc" ]; then
+if [[ $isWSL == true ]]; then
+   reconFolder=/mnt/c/svrtk-docker-gpu/recon
+   dicomFolder=/mnt/c/svrtk-docker-gpu/recon/pride/TempInputSeries/DICOM
+else
+   reconFolder=/home/tr17/svrtk-docker-gpu/recon
+   dicomFolder=/home/tr17/svrtk-docker-gpu/recon/pride/TempInputSeries/DICOM
+fi
 
+echo "host="$(hostname)
+echo "reconFolder="$reconFolder
+echo "dicomFolder="$dicomFolder
+
+# Remote
 remoteUser=tr17
 remoteHost=gpubeastie01-pc.isd.kcl.ac.uk
 remoteDir=/pnraw01/FetalPreprocessing
@@ -24,6 +42,9 @@ remoteDir=/pnraw01/FetalPreprocessing
 # Get Scan/Patient Info from DICOM
 patID=$(dcmdump +P PatientID -s $dicomFolder/IM_0001 | awk -F "[][]" '{print $2}')
 studyDate=$(dcmdump +P StudyDate -s $dicomFolder/IM_0001 | awk -F "[][]" '{print $2}')
+
+echo $patID
+echo $studyDate
 
 YEAR="${studyDate:0:4}"
 MONTH="${studyDate:4:2}" 

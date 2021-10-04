@@ -17,7 +17,7 @@ ECHO DONE
 
 :: Initiate Docker container on Host
 ECHO Performing SVR on Host ...
-ssh %username%@%hostName% bash -c '/home/%username%/%dockerImageName%/recon/pride/SVRs/StartSVR.bash'
+ssh %username%@%hostName% bash -c '/home/%username%/%dockerImageName%/recon/pride/SVR/StartSVR.bash'
 ECHO DONE
 
 :: Copy 3D SVR DICOMs from Host to VM
