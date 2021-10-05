@@ -13,7 +13,7 @@
 ###########################################################
 
 # Check WSL or Linux
-if cat /proc/version | grep Microsoft; then
+if cat /proc/version | grep microsoft; then
    isWSL=true
 else
    isWSL=false

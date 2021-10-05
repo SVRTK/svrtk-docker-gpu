@@ -14,7 +14,7 @@ ECHO DONE
 
 :: Convert DICOMs from PRIDE to nifti, and, copy to recon folder
 ECHO Converting DICOMs to nifti ...
-wsl.exe docker run --gpus all -it -v "/mnt/c/svrtk-docker-gpu/recon":/home/recon %dockerImageName% /home/scripts/svr_dcm2nii.bash > C:\svrtk-docker-gpu\recon\pride\logs\log_svr_dcm2nii.txt
+wsl.exe docker run -v "/mnt/c/svrtk-docker-gpu/recon":/home/recon %dockerImageName% /home/scripts/svr_dcm2nii.bash > C:\svrtk-docker-gpu\recon\pride\logs\log_svr_dcm2nii.txt
 ECHO DONE
 
 :: Run SVRTK GPU Docker reconstruction
@@ -24,10 +24,10 @@ ECHO DONE
 
 :: Convert SVR nifti to DICOM, and, copy to TempOutputSeries
 ECHO Converting SVR nifti to DICOM ...
-wsl.exe docker run --gpus all -it -v "/mnt/c/svrtk-docker-gpu/recon":/home/recon %dockerImageName% python /home/scripts/svr_nii2pridedcm.py > C:\svrtk-docker-gpu\recon\pride\logs\log_svr_nii2pridedcm.txt
+wsl.exe docker run -v "/mnt/c/svrtk-docker-gpu/recon":/home/recon %dockerImageName% python /home/scripts/svr_nii2pridedcm.py > C:\svrtk-docker-gpu\recon\pride\logs\log_svr_nii2pridedcm.txt
 
 :: Create DICOMDIR file
-wsl.exe docker run --gpus all -it -v "/mnt/c/svrtk-docker-gpu/recon":/home/recon %dockerImageName% /home/scripts/svr_make_dicomdir.bash >> C:\svrtk-docker-gpu\recon\pride\logs\log_svr_nii2pridedcm.txt
+wsl.exe docker run -v "/mnt/c/svrtk-docker-gpu/recon":/home/recon %dockerImageName% /home/scripts/svr_make_dicomdir.bash >> C:\svrtk-docker-gpu\recon\pride\logs\log_svr_nii2pridedcm.txt
 ECHO DONE
 
 :: Save Recon Directory
@@ -37,7 +37,7 @@ ECHO DONE
 
 :: Copy files to pnraw
 ECHO Copying files to pnraw01 ...
-wsl.exe /mnt/c/svrtk-docker-gpu/scripts/scp_recon_dir.bash
+wsl.exe /mnt/c/svrtk-docker-gpu/scripts/scp_recon_dir.bash > C:\svrtk-docker-gpu\recon\pride\logs\log_scp_recon.txt
 ECHO DONE
 
 :: Clean Recon Directory

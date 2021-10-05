@@ -37,9 +37,9 @@ ENV PATH="$PATH:/home/dcm2niix/build/bin"
 
 # Install MIRTK/SVRTK
 COPY /MIRTK /home/MIRTK
-RUN mkdir /home/MIRTK/Packages/SVRTK
+RUN mkdir -p /home/MIRTK/Packages/SVRTK
 COPY /SVRTK /home/MIRTK/Packages/SVRTK
-RUN mkdir /home/MIRTK/build \
+RUN mkdir -p /home/MIRTK/build \
 	&& cd /home/MIRTK/build \
 	&& cmake -D WITH_TBB="ON" -D MODULE_SVRTK="ON" .. \
 	&& make -j

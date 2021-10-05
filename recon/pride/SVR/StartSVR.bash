@@ -48,7 +48,7 @@ echo "DONE"
 
 # Copy files to pnraw
 echo "Copying files to pnraw01 ..."
-/home/$userName/$dockerImageName/scripts/scp_recon_dir.bash
+/home/$userName/$dockerImageName/scripts/scp_recon_dir.bash > /home/$userName/$dockerImageName/recon/pride/logs/log_scp_recon.txt
 echo "DONE"
 
 # Clean Recon Directory
