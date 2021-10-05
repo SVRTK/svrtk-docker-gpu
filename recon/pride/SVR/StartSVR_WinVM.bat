@@ -24,3 +24,9 @@ ECHO DONE
 ECHO Copying 3D SVR data from Host to VM ...
 ssh %username%@%hostName% bash -c 'cp -r /home/%username%/%dockerImageName%/recon/pride/TempOutputSeries/ /home/%username%/%vmName%/'
 ECHO DONE
+
+:: Purge TempInputSeries ready for next recon
+ECHO Cleaning VM Directories ...
+ssh %username%@%hostName% bash -c 'rm -rf /home/%username%/%vmName%/TempInputSeries/DICOM'
+ssh %username%@%hostName% bash -c 'rm -f /home/%username%/%vmName%/TempInputSeries/DICOMDIR'
+ECHO DONE
