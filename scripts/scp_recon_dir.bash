@@ -21,7 +21,6 @@ fi
 
 
 # Setup
-# if [ $(hostname) = "pridesvr02-pc" ]; then
 if [[ $isWSL == true ]]; then
    reconFolder=/mnt/c/svrtk-docker-gpu/recon
    dicomFolder=/mnt/c/svrtk-docker-gpu/recon/pride/TempInputSeries/DICOM
