@@ -26,6 +26,7 @@ cnn_mode=$2
 #severity of motion mode: -1 minor, 1 severe
 motion_correction_mode=$3
 
+
 source ~/.bashrc
 cd ${default_recon_dir}
 
@@ -249,11 +250,13 @@ do
     ${mirtk_path}/mirtk extract-connected-components mask-files-${roi_ids[${selected_recon_roi}]}/mask-${jj}.nii.gz mask-files-${roi_ids[${selected_recon_roi}]}/mask-${jj}.nii.gz -max-size 800000
 
     # centering stacks vs. brain centre for severe motion cases
-    if [ $motion_correction_mode -gt 0 ]; then
-        ${mirtk_path}/mirtk transform-image mask-files-${roi_ids[$selected_recon_roi]}/mask-${jj}.nii.gz mask-files-${roi_ids[$selected_recon_roi]}/mask-${jj}.nii.gz -target  cropped-files/cropped-stack-${jj}.nii.gz -interp NN
-        ${mirtk_path}/mirtk centre_volume  cropped-files/cropped-stack-${jj}.nii.gz mask-files-${roi_ids[$selected_recon_roi]}/mask-${jj}.nii.gz cropped-files/cropped-stack-${jj}.nii.gz
-        ${mirtk_path}/mirtk centre_volume  mask-files-${roi_ids[$selected_recon_roi]}/mask-${jj}.nii.gz mask-files-${roi_ids[$selected_recon_roi]}/mask-${jj}.nii.gz mask-files-${roi_ids[$selected_recon_roi]}/mask-${jj}.nii.gz
-    fi
+    #if [ $motion_correction_mode -gt 0 ]; then
+    
+    ${mirtk_path}/mirtk transform-image mask-files-${roi_ids[$selected_recon_roi]}/mask-${jj}.nii.gz mask-files-${roi_ids[$selected_recon_roi]}/mask-${jj}.nii.gz -target  cropped-files/cropped-stack-${jj}.nii.gz -interp NN
+    ${mirtk_path}/mirtk centre_volume cropped-files/cropped-stack-${jj}.nii.gz mask-files-${roi_ids[$selected_recon_roi]}/mask-${jj}.nii.gz cropped-files/cropped-stack-${jj}.nii.gz
+    ${mirtk_path}/mirtk centre_volume mask-files-${roi_ids[$selected_recon_roi]}/mask-${jj}.nii.gz mask-files-${roi_ids[$selected_recon_roi]}/mask-${jj}.nii.gz mask-files-${roi_ids[$selected_recon_roi]}/mask-${jj}.nii.gz
+    
+    #fi
 
     echo stack-files/stack-${jj}.nii.gz " - " cropped-cnn-out-files/*-${jj}_seg_pr*.nii* " - " mask-files-${roi_ids[${selected_recon_roi}]}/mask-${jj}.nii.gz
 done
