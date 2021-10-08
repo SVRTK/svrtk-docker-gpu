@@ -23,7 +23,7 @@ echo "DONE"
 
 # Run SVRTK GPU Docker reconstruction
 echo "Running SVR reconstruction ..."
-docker run --gpus all -v "/home/$userName/$dockerImageFolderName/recon":/home/recon $dockerImageName /home/scripts/docker-recon-brain-auto.bash /home/recon/ > /home/$userName/$dockerImageFolderName/recon/pride/logs/log_svrtk_docker_gpu.txt
+docker run --gpus all -v "/home/$userName/$dockerImageFolderName/recon":/home/recon $dockerImageName /home/scripts/docker-recon-brain-auto.bash /home/recon/ -1 -1 > /home/$userName/$dockerImageFolderName/recon/pride/logs/log_svrtk_docker_gpu.txt
 echo "DONE"
 
 # Convert SVR nifti to DICOM, and, copy to TempOutputSeries

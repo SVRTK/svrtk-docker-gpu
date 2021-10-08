@@ -2,7 +2,7 @@
 
 
 ##########################################################################################################################
-###### SCRIPT FOR AUTOMATED SVR RECONSTRUCTION (GPU-based): docker-recon-brain-auto.bash
+###### SCRIPT FOR AUTOMATED SVR RECONSTRUCTION (incl. optional GPU-acceleration): docker-recon-brain-auto.bash
 ###### King's College London 2021
 ###### https://github.com/SVRTK/svrtk-docker-gpu
 ##########################################################################################################################
