@@ -374,7 +374,7 @@ echo
 
 # SVR reconstruction
 nStacks=$(ls proc-stacks/*.nii* | wc -l)
-${mirtk_path}/mirtk reconstruct ${main_dir}/${roi_recon[${selected_recon_roi}]}-output.nii.gz  ${nStacks} proc-stacks/*.nii* -mask average_mask_cnn.nii.gz -template average_volume.nii.gz -default_thickness ${default_thickness} -svr_only -remote -iterations 3 -structural -resolution ${output_resolution}
+${mirtk_path}/mirtk reconstruct ${main_dir}/${roi_recon[${selected_recon_roi}]}-output.nii.gz  ${nStacks} proc-stacks/*.nii* -mask average_mask_cnn.nii.gz -template average_volume.nii.gz -default_thickness ${default_thickness} -svr_only -iterations 3 -structural -resolution ${output_resolution}
 
 test_file=${main_dir}/${roi_recon[${selected_recon_roi}]}-output.nii.gz
 if [[ ! -f ${test_file} ]];then
