@@ -1,6 +1,6 @@
 @echo off
 
-:: StartSVR.bat - Wrapper script for performing SVR via Pride
+:: StartSVR_GPU.bat - Wrapper script for performing GPU-accelerated SVR via Pride
 
 :: Docker image name (default: svrtk-docker-gpu)
 set hostName=%COMPUTERNAME%
@@ -20,7 +20,7 @@ ECHO DONE
 
 :: Run SVRTK GPU Docker reconstruction
 ECHO Running SVR reconstruction ...
-wsl.exe docker run -it -v "/mnt/c/svrtk-docker-gpu/recon":/home/recon %dockerImageName% /home/scripts/docker-recon-brain-auto.bash /home/recon/ -1 -1 > C:\svrtk-docker-gpu\recon\pride\logs\log_svrtk_docker_gpu.txt
+wsl.exe docker run -it --gpus all -v "/mnt/c/svrtk-docker-gpu/recon":/home/recon %dockerImageName% /home/scripts/docker-recon-brain-auto.bash /home/recon/ 1 -1 > C:\svrtk-docker-gpu\recon\pride\logs\log_svrtk_docker_gpu.txt
 ECHO DONE
 
 :: Convert SVR nifti to DICOM, and, copy to TempOutputSeries
