@@ -3,7 +3,7 @@
 :: StartSVR.bat - Wrapper script for performing SVR via Pride
 
 :: Docker image name (default: svrtk-docker-gpu)
-set "dockerImageName=svrtk-docker-gpu"
+set hostName=%COMPUTERNAME%
 ECHO Using Docker Image: %dockerImageName%
 
 :: Clear TempOutputSeries
@@ -35,10 +35,12 @@ ECHO Saving recon directory ...
 powershell.exe C:\svrtk-docker-gpu\scripts\reconDirSave.bat
 ECHO DONE
 
-:: Copy files to pnraw
-ECHO Copying files to pnraw01 ...
-wsl.exe /mnt/c/svrtk-docker-gpu/scripts/scp_recon_dir.bash > C:\svrtk-docker-gpu\recon\pride\logs\log_scp_recon.txt
-ECHO DONE
+:: Copy files to pnraw - nb: KCL specific script
+if "%hostName%" EQU "PRIDESVR02-PC" (
+	ECHO Copying files to pnraw01 ...
+	wsl.exe /mnt/c/svrtk-docker-gpu/scripts/scp_recon_dir.bash > C:\svrtk-docker-gpu\recon\pride\logs\log_scp_recon.txt
+	ECHO DONE
+)
 
 :: Clean Recon Directory
 ECHO Cleaning recon directory ...
