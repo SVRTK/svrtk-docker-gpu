@@ -453,7 +453,8 @@ def elem_initialise(uid_instance, uid_series_instance, uid_frame_of_reference, n
         #'PrivateCreator20050013': 'Philips MR Imaging DD 001',          # v. important (MC said required)
         'unknowntag20051035': 'PIXEL',                                  # v. important (MC said required)
         'ChemicalShiftNumberMR': 0,
-        'SliceOrientation': 'SAGITTAL',
+        'SliceOrientation': 'TRANSVERSE',
+        'VolumetricProperties': 'VOLUME',
         'ScanningTechnique': 'TSE',
         'PhaseNumber': 1,
         'NumberOfEchoes': 1,
@@ -483,7 +484,7 @@ def create_seq_stack():
     setattr(stack_code, 'PrivateCreator20010010', 'Philips MR Imaging DD 001' )
     setattr(stack_code, 'StackNumberOfSlices', nii_parameters['NumberOfSlices'] )
     setattr(stack_code, 'StackRadialAngle', 0 )
-    setattr(stack_code, 'StackRadialAxis', 'AP' )
+    setattr(stack_code, 'StackRadialAxis', 'RL' )
     setattr(stack_code, 'MRSeriesDataType', 1 )
     setattr(stack_code, 'StackType', 'PARALLEL' )
     setattr(stack_code, 'PrivateCreator20050010', 'Philips MR Imaging DD 001' )
@@ -498,9 +499,9 @@ def create_seq_stack():
     setattr(stack_code, 'MRStackOffcentreAP', 0 )
     setattr(stack_code, 'MRStackOffcentreFH', 0 )
     setattr(stack_code, 'MRStackOffcentreRL', 0 )
-    setattr(stack_code, 'MRStackPreparationDirection', 'AP' )
-    setattr(stack_code, 'MRStackSliceDistance', 1 )
-    setattr(stack_code, 'MRStackViewAxis', 'RL' )
+    setattr(stack_code, 'MRStackPreparationDirection', 'RL' )
+    setattr(stack_code, 'MRStackSliceDistance', round(float(nii_parameters['SpacingBetweenSlices']),2) )
+    setattr(stack_code, 'MRStackViewAxis', 'FH' )
     setattr(stack_code, 'MRStackTablePosLong', 0 )
     setattr(stack_code, 'MRStackTablePosLat', 0 )
     setattr(stack_code, 'MRStackPosteriorCoilPos', 0 )
