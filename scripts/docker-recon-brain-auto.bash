@@ -457,30 +457,26 @@ ${mirtk_path}/mirtk crop_volume ${main_dir}/reo-${roi_recon[${selected_recon_roi
 
 echo
 echo "-----------------------------------------------------------------------------"
-echo "TRANSFORMING TO 250x250x250 grid"
+echo "ADJUSTING & RENAMING FINAL FILES"
 echo "-----------------------------------------------------------------------------"
 echo
 
 test_file=${main_dir}/reo-${roi_recon[${selected_recon_roi}]}-output.nii.gz
 if [[ -f ${test_file} ]];then
 
-    # TAR - pad to cuboid for Philips import
-    cp ${main_dir}/reo-${roi_recon[${selected_recon_roi}]}-output.nii.gz ${main_dir}/reo-${roi_recon[${selected_recon_roi}]}-output-withoutPadding.nii.gz
-    # ${mirtk_path}/mirtk resample-image ${main_dir}/reo-${roi_recon[$selected_recon_roi]}-output.nii.gz ${main_dir}/reo-${roi_recon[$selected_recon_roi]}-output.nii.gz -imsize 180 180 180
-    ${mirtk_path}/mirtk pad-3d ${main_dir}/reo-${roi_recon[${selected_recon_roi}]}-output-withoutPadding.nii.gz ${main_dir}/reo-${roi_recon[${selected_recon_roi}]}-output.nii.gz 250 1
-
     # TAR - rename files
     mv ${main_dir}/${roi_recon[${selected_recon_roi}]}-output.nii.gz ${main_dir}/${roi_recon[${selected_recon_roi}]}-output-withoutReorientation.nii.gz
     cp ${main_dir}/reo-${roi_recon[${selected_recon_roi}]}-output.nii.gz ${main_dir}/${roi_recon[${selected_recon_roi}]}-output.nii.gz
 
-    cp ${main_dir}/${roi_recon[${selected_recon_roi}]}-output-withoutReorientation.nii.gz ${default_recon_dir}/${roi_recon[${selected_recon_roi}]}-outputwithoutReorientation.nii.gz
+	# TAR - move final files to /recon dir
+    cp ${main_dir}/${roi_recon[${selected_recon_roi}]}-output-withoutReorientation.nii.gz ${default_recon_dir}/${roi_recon[${selected_recon_roi}]}-output-withoutReorientation.nii.gz
     cp ${main_dir}/${roi_recon[${selected_recon_roi}]}-output.nii.gz ${default_recon_dir}/${roi_recon[${selected_recon_roi}]}-output.nii.gz
 
     echo "Reconstruction was successful: " ${default_recon_dir}/${roi_recon[${selected_recon_roi}]}-output.nii.gz
 
 else
     echo "Reconstruction failed ... "
-    echo "ERROR : RECONSTRUCTION PIPELINE FAILE (REORIENTATION OR SAVING STEP). " > ${default_recon_dir}/error.txt
+    echo "ERROR : RECONSTRUCTION PIPELINE FAILED (REORIENTATION OR SAVING STEP). " > ${default_recon_dir}/error.txt
 fi
 
 
