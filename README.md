@@ -89,7 +89,8 @@ cd /home/$USER/svrtk-docker-gpu
 ```
 wget https://gin.g-node.org/SVRTK/fetal_mri_network_weights/raw/master/checkpoints-brain-loc-2-labels/latest.ckpt -P Segmentation_FetalMRI/trained-models/checkpoints-brain-loc-labels \
 	&& wget https://gin.g-node.org/SVRTK/fetal_mri_network_weights/raw/master/checkpoints-brain-loc-2-labels-cropped/latest.ckpt -P Segmentation_FetalMRI/trained-models/checkpoints-brain-loc-labels-cropped \
-	&& wget https://gin.g-node.org/SVRTK/fetal_mri_network_weights/raw/master/checkpoints-brain-reo-5-labels/latest.ckpt -P Segmentation_FetalMRI/trained-models/checkpoints-brain-reorientation
+	&& wget https://gin.g-node.org/SVRTK/fetal_mri_network_weights/raw/master/checkpoints-brain-reo-5-labels/latest.ckpt -P Segmentation_FetalMRI/trained-models/checkpoints-brain-reorientation \
+	&& wget https://gin.g-node.org/SVRTK/fetal_mri_network_weights/raw/master/checkpoints-brain-reo-5-labels-raw-stacks/latest.ckpt -P Segmentation_FetalMRI/trained-models/checkpoints-brain-reorientation-stacks
 ```
 
 #### 2.3 Build the container using the Dockerfile:
