@@ -96,13 +96,13 @@ wget https://gin.g-node.org/SVRTK/fetal_mri_network_weights/raw/master/checkpoin
 #### 2.3 Build the container using the Dockerfile:
 
 ```
-$ docker build -f svrtk-docker-gpu.Dockerfile -t svrtk-docker-gpu .
+docker build -f svrtk-docker-gpu.Dockerfile -t svrtk-docker-gpu .
 ```
 
 #### 2.4 Test the Docker container is working:
 
 ```
-$ docker run -it svrtk-docker-gpu
+docker run -it svrtk-docker-gpu
 ```
 Once inside the container, test MIRTK is working by running:
 
