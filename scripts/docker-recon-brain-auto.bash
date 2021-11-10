@@ -261,8 +261,8 @@ do
     echo stack-files/stack-${jj}.nii.gz " - " cropped-cnn-out-files/*-${jj}_seg_pr*.nii* " - " mask-files-${roi_ids[${selected_recon_roi}]}/mask-${jj}.nii.gz
 done
 
-## CNN landmark-based reorientation of stacks to the standard space for severe motion cases (default now)
-#if [ $motion_correction_mode -gt 0 ]; then
+# CNN landmark-based reorientation of stacks to the standard space for severe motion cases
+if [ $motion_correction_mode -gt 0 ]; then
 
     mkdir cropped-cnn-out-files-4reo
     mkdir stack-dofs-to-atl
@@ -326,7 +326,7 @@ done
 
     done
 
-#fi
+fi
 
 ##########################################################################################################################
 ###### STACK SELECTION + SVR RECONSTRUCTION
