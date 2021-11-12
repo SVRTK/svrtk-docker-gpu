@@ -4,7 +4,7 @@
 
 :: Docker image name (default: svrtk-docker-gpu)
 set hostName=%COMPUTERNAME%
-set "dockerImageName=fetalsvrtk/svrtk:pride-svr-docker-0.10"
+set "dockerImageName=fetalsvrtk/svrtk:svrtk-docker-gpu-0.10"
 ECHO Using Docker Image: %dockerImageName%
 
 :: Clear TempOutputSeries
