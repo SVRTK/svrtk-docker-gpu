@@ -467,6 +467,9 @@ if [[ -f ${test_file} ]];then
     # TAR - rename files
     mv ${main_dir}/${roi_recon[${selected_recon_roi}]}-output.nii.gz ${main_dir}/${roi_recon[${selected_recon_roi}]}-output-withoutReorientation.nii.gz
     cp ${main_dir}/reo-${roi_recon[${selected_recon_roi}]}-output.nii.gz ${main_dir}/${roi_recon[${selected_recon_roi}]}-output.nii.gz
+	
+	# TAR - pad in-plane so square FOV
+	${mirtk_path}/mirtk resample-to-iso-grid ${main_dir}/${roi_recon[${selected_recon_roi}]}-output.nii.gz ${main_dir}/${roi_recon[${selected_recon_roi}]}-output.nii.gz 2
 
 	# TAR - move final files to /recon dir
     cp ${main_dir}/${roi_recon[${selected_recon_roi}]}-output-withoutReorientation.nii.gz ${default_recon_dir}/${roi_recon[${selected_recon_roi}]}-output-withoutReorientation.nii.gz
