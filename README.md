@@ -58,12 +58,12 @@ git clone --recurse-submodules https://github.com/SVRTK/svrtk-docker-gpu.git /ho
 ### Option 1 --- Install using pre-built Docker image
 #### 1.1 Download the pre-built Docker image from DockerHub:
 ```
-docker pull fetalsvrtk/svrtk:pride-svr-docker-0.10
+docker pull fetalsvrtk/svrtk:pride-svr-docker-0.2.0
 ```
 #### 1.2 Test the Docker container is working:
 
 ```
-docker run -it fetalsvrtk/svrtk:pride-svr-docker-0.10
+docker run -it fetalsvrtk/svrtk:pride-svr-docker-0.2.0
 ```
 Once inside the container, test MIRTK is working by running:
 
@@ -96,13 +96,13 @@ wget https://gin.g-node.org/SVRTK/fetal_mri_network_weights/raw/master/checkpoin
 #### 2.3 Build the container using the Dockerfile:
 
 ```
-docker build -f svrtk-docker-gpu.Dockerfile -t fetalsvrtk/svrtk:pride-svr-docker-0.10 .
+docker build -f svrtk-docker-gpu.Dockerfile -t fetalsvrtk/svrtk:pride-svr-docker-0.2.0 .
 ```
 
 #### 2.4 Test the Docker container is working:
 
 ```
-docker run -it fetalsvrtk/svrtk:pride-svr-docker-0.10
+docker run -it fetalsvrtk/svrtk:pride-svr-docker-0.2.0
 ```
 Once inside the container, test MIRTK is working by running:
 
@@ -122,7 +122,7 @@ Copy nifti files (labelled `stack1.nii.gz`, `stack2.nii.gz`, ... `stackN.nii.gz`
 Then:
 
 ```
-docker run -v "svrtk-docker-gpu/recon":/home/recon fetalsvrtk/svrtk:pride-svr-docker-0.10 /home/scripts/docker-recon-brain-auto.bash /home/recon
+docker run -v "svrtk-docker-gpu/recon":/home/recon fetalsvrtk/svrtk:pride-svr-docker-0.2.0 /home/scripts/docker-recon-brain-auto.bash /home/recon
 ```
 
 This will output a 3D SVR-reconstructed volume named `SVR-output.nii.gz`.
@@ -131,5 +131,5 @@ This will output a 3D SVR-reconstructed volume named `SVR-output.nii.gz`.
 ##### Optional:
 If you have successfully installed CUDA, you can run the GPU-accelerated version with:
 ```
-docker run -it --gpus all -v "svrtk-docker-gpu/recon":/home/recon fetalsvrtk/svrtk:pride-svr-docker-0.10 /home/scripts/docker-recon-brain-auto.bash /home/recon
+docker run -it --gpus all -v "svrtk-docker-gpu/recon":/home/recon fetalsvrtk/svrtk:pride-svr-docker-0.2.0 /home/scripts/docker-recon-brain-auto.bash /home/recon
 ```
