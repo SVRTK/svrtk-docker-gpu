@@ -455,7 +455,7 @@ def elem_initialise(uid_instance, uid_series_instance, uid_frame_of_reference, n
         #'PrivateCreator20050013': 'Philips MR Imaging DD 001',          # v. important (MC said required)
         'unknowntag20051035': 'PIXEL',                                  # v. important (MC said required)
         'ChemicalShiftNumberMR': 0,
-        'SliceOrientation': 'TRANSVERSAL',
+        'SliceOrientation': 'TRANSVERSE',
         'VolumetricProperties': 'VOLUME',
         'ScanningTechnique': 'TSE',
         'PhaseNumber': 1,
