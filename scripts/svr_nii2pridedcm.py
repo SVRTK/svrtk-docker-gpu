@@ -64,6 +64,8 @@ new_dict_items = {
     0x2001101a: ('FL', '3', "PC Velocity", '', 'PCVelocity'),
     0x2001101d: ('IS', '1', "Reconstruction Number MR", '', 'ReconstructionNumberMR'),
     0x20051035: ('CS', '1', '', '', 'unknowntag20051035'), # PIXEL --- this seems to also correspond to MRSeriesDataType?
+    0x20051011: ('CS', '1', 'MR Image Type', '', 'MRImageType'),
+    0x2005106e: ('CS', '1', 'MR Scan Sequence', '', 'MRScanSequence'),
     
     # Philips "Stack" Tags
     0x2001105f: ('SQ', '1','Stack','','Stack'),
@@ -463,7 +465,8 @@ def elem_initialise(uid_instance, uid_series_instance, uid_frame_of_reference, n
         'NumberOfStacks': 1,
         'ReconstructionNumberMR': 2,
         'NumberOfDynamicScans': 1,
-
+        'MRImageType': 'M',
+        'MRScanSequence': 'SE',
     }
 
     return elements_to_define_meta, elements_to_transfer_meta, elements_to_define_ds, elements_to_transfer_ds, non_std_elements_to_define_ds
@@ -564,7 +567,7 @@ for iInstance in range(0,nInstances):
 
     # override elements
     setattr(ds, 'SeriesNumber', str(int(str(getattr(dcmIn, 'SeriesNumber'))) + 1) ) # +1 to SeriesNumber
-    # setattr(ds, 'AcquisitionNumber', str(getattr(dcmIn, 'AcquisitionNumber')))
+    setattr(ds, 'AcquisitionNumber', str(getattr(dcmIn, 'SeriesNumber'))[:-2])
     # setattr(ds, 'InstanceCreationDate', str(today_date) )
     # setattr(ds, 'InstanceCreationTime', str(today_time) )
     # setattr(ds, 'SeriesDate', str(today_date) )

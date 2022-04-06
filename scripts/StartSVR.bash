@@ -5,8 +5,8 @@
 # Admin
 userName=$USER
 
-# Docker image name (default: svrtk-docker-gpu)
-dockerImageName=fetalsvrtk/svrtk:svrtk-docker-gpu
+# Docker image name
+dockerImageName=fetalsvrtk/svrtk:pride-svr-docker-0.2.0
 dockerImageFolderName=svrtk-docker-gpu
 echo "Using Docker Image:" $dockerImageName
 
